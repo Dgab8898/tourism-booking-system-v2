@@ -2,6 +2,6 @@
 
 A full-stack tourism booking platform built with React, TypeScript, Node.js, Express, MongoDB, and AWS.
 
-## Status
+## Project status
 
-Project setup in progress.
+Initial project setup.
