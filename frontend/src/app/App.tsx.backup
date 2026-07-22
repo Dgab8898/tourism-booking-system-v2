@@ -1,4 +1,3 @@
-import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
 import { useState } from "react";
 import {
   MapPin,
@@ -20,6 +19,144 @@ import {
   Heart,
   Check,
 } from "lucide-react";
+
+const DESTINATIONS = [
+  {
+    id: 1,
+    name: "Santorini",
+    country: "Greece",
+    image: "https://images.unsplash.com/photo-1534695215921-52f8a19e7909?w=800&h=600&fit=crop&auto=format",
+    tag: "Island Escape",
+    rating: 4.9,
+    reviews: 1284,
+    startingFrom: 1890,
+  },
+  {
+    id: 2,
+    name: "Bali",
+    country: "Indonesia",
+    image: "https://images.unsplash.com/photo-1709140624408-0a63fb49a0d1?w=800&h=600&fit=crop&auto=format",
+    tag: "Tropical Haven",
+    rating: 4.8,
+    reviews: 2103,
+    startingFrom: 1290,
+  },
+  {
+    id: 3,
+    name: "Paris",
+    country: "France",
+    image: "https://images.unsplash.com/photo-1609971757431-439cf7b4141b?w=800&h=600&fit=crop&auto=format",
+    tag: "City of Light",
+    rating: 4.7,
+    reviews: 3891,
+    startingFrom: 1450,
+  },
+  {
+    id: 4,
+    name: "Kyoto",
+    country: "Japan",
+    image: "https://images.unsplash.com/photo-1598957232485-fab51e0ed7e8?w=800&h=600&fit=crop&auto=format",
+    tag: "Cultural Gem",
+    rating: 4.9,
+    reviews: 987,
+    startingFrom: 2100,
+  },
+  {
+    id: 5,
+    name: "Antelope Canyon",
+    country: "USA",
+    image: "https://images.unsplash.com/photo-1636311838630-f38d42915aac?w=800&h=600&fit=crop&auto=format",
+    tag: "Natural Wonder",
+    rating: 4.8,
+    reviews: 654,
+    startingFrom: 980,
+  },
+  {
+    id: 6,
+    name: "Maldives",
+    country: "Indian Ocean",
+    image: "https://images.unsplash.com/photo-1623784373624-26fb62d3076d?w=800&h=600&fit=crop&auto=format",
+    tag: "Luxury Retreat",
+    rating: 5.0,
+    reviews: 712,
+    startingFrom: 3200,
+  },
+];
+
+const PACKAGES = [
+  {
+    id: 1,
+    title: "Greek Islands Discovery",
+    destination: "Santorini & Mykonos",
+    image: "https://images.unsplash.com/photo-1563789031959-4c02bcb41319?w=900&h=560&fit=crop&auto=format",
+    duration: "10 Days",
+    groupSize: "2–12",
+    price: 3490,
+    originalPrice: 4200,
+    rating: 4.9,
+    reviews: 341,
+    includes: ["5-star hotel", "Daily breakfast", "Island hopping", "Guided tours", "Airport transfers"],
+    highlights: "Caldera sunsets, volcanic beaches, authentic taverna dining, and ancient ruins.",
+    category: "Luxury",
+  },
+  {
+    id: 2,
+    title: "Bali Spirit Journey",
+    destination: "Ubud & Seminyak",
+    image: "https://images.unsplash.com/photo-1589632732202-bd154e6e116d?w=900&h=560&fit=crop&auto=format",
+    duration: "8 Days",
+    groupSize: "2–8",
+    price: 2190,
+    originalPrice: 2800,
+    rating: 4.8,
+    reviews: 512,
+    includes: ["Boutique villa", "Yoga sessions", "Rice terrace trekking", "Temple visits", "Spa treatments"],
+    highlights: "Sacred temples, terraced rice paddies, traditional dance performances, and healing rituals.",
+    category: "Wellness",
+  },
+  {
+    id: 3,
+    title: "Japan in Full Bloom",
+    destination: "Tokyo, Kyoto & Osaka",
+    image: "https://images.unsplash.com/photo-1557409518-691ebcd96038?w=900&h=560&fit=crop&auto=format",
+    duration: "14 Days",
+    groupSize: "2–10",
+    price: 4850,
+    originalPrice: 5600,
+    rating: 4.9,
+    reviews: 228,
+    includes: ["Ryokan & hotel mix", "JR Rail Pass", "Tea ceremony", "Shinkansen rides", "Expert guide"],
+    highlights: "Cherry blossoms, samurai history, street food markets, futuristic cities, and tranquil temples.",
+    category: "Cultural",
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    name: "Amara Osei",
+    location: "London, UK",
+    text: "The Santorini package exceeded every expectation. The attention to detail — from the cliffside hotel to the private sunset cruise — made it completely unforgettable.",
+    rating: 5,
+    avatar: "AO",
+    trip: "Greek Islands Discovery",
+  },
+  {
+    name: "Priya Mehta",
+    location: "Mumbai, India",
+    text: "Booking through Wanderlust was seamless. They handled everything and our Bali guide was extraordinary. I felt completely taken care of from the moment I landed.",
+    rating: 5,
+    avatar: "PM",
+    trip: "Bali Spirit Journey",
+  },
+  {
+    name: "Lucas Ferreira",
+    location: "São Paulo, Brazil",
+    text: "Japan in Full Bloom was the trip of my life. Seeing cherry blossoms in Kyoto while staying in a traditional ryokan — I still can't believe it was real.",
+    rating: 5,
+    avatar: "LF",
+    trip: "Japan in Full Bloom",
+  },
+];
 
 type Page = "home" | "destinations" | "packages" | "about";
 
