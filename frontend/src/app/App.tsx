@@ -1,5 +1,7 @@
-import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
 import { useState } from "react";
+
+import { Navbar, type Page } from "../components/layout/Navbar";
+import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
 import {
   MapPin,
   Calendar,
@@ -20,8 +22,6 @@ import {
   Heart,
   Check,
 } from "lucide-react";
-
-type Page = "home" | "destinations" | "packages" | "about";
 
 interface BookingModalProps {
   pkg: typeof PACKAGES[0] | null;
@@ -289,48 +289,10 @@ export default function App() {
       className="min-h-screen bg-background text-foreground"
       style={{ fontFamily: "'Nunito', sans-serif" }}
     >
-      {/* ───────────── NAV ───────────── */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <button
-            onClick={() => setPage("home")}
-            className="flex items-center gap-2 group"
-          >
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Plane size={16} className="text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-              Wanderlust
-            </span>
-          </button>
-
-          <nav className="hidden md:flex items-center gap-8">
-            {(["home", "destinations", "packages", "about"] as Page[]).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`text-sm font-semibold capitalize transition-colors ${
-                  page === p ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <button className="hidden md:block text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors">
-              Sign In
-            </button>
-            <button
-              onClick={() => setPage("packages")}
-              className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
-            >
-              Book Now
-            </button>
-          </div>
-        </div>
-      </header>
+      <Navbar
+        currentPage={page}
+        onNavigate={setPage}
+      />
 
       {/* ───────────── HOME ───────────── */}
       {page === "home" && (
