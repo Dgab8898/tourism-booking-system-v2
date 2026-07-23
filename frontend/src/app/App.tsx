@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Navbar, type Page } from "../components/layout/Navbar";
 import { Hero } from "../components/home/Hero";
+import { FeaturedDestinations } from "../components/home/FeaturedDestinations";
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
 import {
   MapPin,
@@ -328,78 +329,13 @@ export default function App() {
           </section>
 
           {/* Featured Destinations */}
-          <section className="py-20 px-6 max-w-7xl mx-auto">
-            <div className="flex items-end justify-between mb-12">
-              <div>
-                <p className="text-accent text-sm font-bold uppercase tracking-widest mb-2">Explore the Globe</p>
-                <h2 className="text-4xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Top Destinations
-                </h2>
-              </div>
-              <button
-                onClick={() => setPage("destinations")}
-                className="flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all"
-              >
-                View All <ArrowRight size={16} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {DESTINATIONS.slice(0, 6).map((dest) => (
-                <div
-                  key={dest.id}
-                  className="group relative rounded-2xl overflow-hidden bg-stone-200 cursor-pointer"
-                  style={{ aspectRatio: "4/3" }}
-                  onClick={() => setPage("packages")}
-                >
-                  <img
-                    src={dest.image}
-                    alt={`${dest.name}, ${dest.country}`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-                  {/* Wishlist */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleWishlist(dest.id);
-                    }}
-                    className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/40 transition-colors"
-                  >
-                    <Heart
-                      size={16}
-                      className={wishlist.includes(dest.id) ? "fill-red-400 text-red-400" : "text-white"}
-                    />
-                  </button>
-
-                  <span className="absolute top-4 left-4 px-3 py-1 bg-accent text-white text-xs font-bold rounded-full">
-                    {dest.tag}
-                  </span>
-
-                  <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <div className="flex items-end justify-between">
-                      <div>
-                        <h3 className="text-white text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-                          {dest.name}
-                        </h3>
-                        <div className="flex items-center gap-1 text-white/80 text-sm">
-                          <MapPin size={12} /> {dest.country}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 justify-end">
-                          <Star size={13} className="fill-amber-400 text-amber-400" />
-                          <span className="text-white text-sm font-semibold">{dest.rating}</span>
-                        </div>
-                        <p className="text-white/70 text-xs">From ${dest.startingFrom.toLocaleString()}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <FeaturedDestinations
+            destinations={DESTINATIONS}
+            wishlist={wishlist}
+            onToggleWishlist={toggleWishlist}
+            onViewDestination={() => setPage("packages")}
+            onViewAll={() => setPage("destinations")}
+          />
 
           {/* Why Us */}
           <section className="py-16 bg-muted">
