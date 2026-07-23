@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Navbar, type Page } from "../components/layout/Navbar";
+import { Hero } from "../components/home/Hero";
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
 import {
   MapPin,
@@ -297,78 +298,15 @@ export default function App() {
       {/* ───────────── HOME ───────────── */}
       {page === "home" && (
         <>
-          {/* Hero */}
-          <section className="relative h-[88vh] min-h-[560px] bg-stone-800 overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1732808460864-b8e5eb489a52?w=1920&h=1080&fit=crop&auto=format"
-              alt="Stunning sunset over a tranquil sea"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/30 to-black/70" />
-
-            <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
-              <span className="inline-block px-4 py-1.5 bg-accent/90 text-white text-xs font-bold uppercase tracking-widest rounded-full mb-6">
-                Crafted Journeys Since 2009
-              </span>
-              <h1
-                className="text-white text-5xl md:text-7xl font-bold leading-tight mb-4 max-w-3xl"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                The World Is{" "}
-                <em className="italic text-accent">Waiting</em>
-                <br />
-                for You
-              </h1>
-              <p className="text-white/80 text-lg md:text-xl max-w-xl mb-10">
-                Curated travel experiences across 60+ destinations — from barefoot luxury to cultural immersion.
-              </p>
-
-              {/* Search bar */}
-              <div className="w-full max-w-3xl bg-card rounded-2xl shadow-2xl p-2 flex flex-col md:flex-row gap-2">
-                <div className="flex-1 flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-muted transition-colors">
-                  <MapPin size={18} className="text-accent shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Where do you want to go?"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none w-full"
-                  />
-                </div>
-                <div className="hidden md:block w-px bg-border self-stretch" />
-                <div className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-muted transition-colors">
-                  <Calendar size={18} className="text-accent shrink-0" />
-                  <input
-                    type="date"
-                    value={searchDate}
-                    onChange={(e) => setSearchDate(e.target.value)}
-                    className="bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-                  />
-                </div>
-                <div className="hidden md:block w-px bg-border self-stretch" />
-                <div className="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-muted transition-colors">
-                  <Users size={18} className="text-accent shrink-0" />
-                  <select
-                    value={searchTravelers}
-                    onChange={(e) => setSearchTravelers(e.target.value)}
-                    className="bg-transparent text-sm text-foreground focus:outline-none"
-                  >
-                    {[1, 2, 3, 4, 5, 6].map((n) => (
-                      <option key={n} value={String(n)}>
-                        {n} {n === 1 ? "Traveler" : "Travelers"}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <button
-                  onClick={() => setPage("destinations")}
-                  className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-opacity shrink-0"
-                >
-                  <Search size={16} /> Search
-                </button>
-              </div>
-            </div>
-          </section>
+          <Hero
+            searchQuery={searchQuery}
+            searchDate={searchDate}
+            searchTravelers={searchTravelers}
+            onSearchQueryChange={setSearchQuery}
+            onSearchDateChange={setSearchDate}
+            onSearchTravelersChange={setSearchTravelers}
+            onSearch={() => setPage("destinations")}
+          />
 
           {/* Stats bar */}
           <section className="bg-primary text-primary-foreground py-6">
