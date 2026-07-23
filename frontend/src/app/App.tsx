@@ -6,6 +6,7 @@ import { StatsBar } from "../components/home/StatsBar";
 import { FeaturedDestinations } from "../components/home/FeaturedDestinations";
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
 import { WhyChooseUs } from "../components/home/WhyChooseUs";
+import { Testimonials } from "../components/home/Testimonials";
 import { CallToAction } from "../components/home/CallToAction";
 import {
   MapPin,
@@ -328,35 +329,7 @@ export default function App() {
           <WhyChooseUs />
 
           {/* Testimonials */}
-          <section className="py-20 px-6 max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-accent text-sm font-bold uppercase tracking-widest mb-2">Stories from the Road</p>
-              <h2 className="text-4xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-                What Travelers Say
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {TESTIMONIALS.map((t) => (
-                <div key={t.name} className="bg-card rounded-2xl p-7 border border-border shadow-sm flex flex-col gap-4">
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-foreground text-sm leading-relaxed flex-1">"{t.text}"</p>
-                  <div className="flex items-center gap-3 pt-2 border-t border-border">
-                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
-                      {t.avatar}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm">{t.name}</p>
-                      <p className="text-muted-foreground text-xs">{t.location} · {t.trip}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+          <Testimonials testimonials={TESTIMONIALS} />
 
           {/* CTA Banner */}
           <CallToAction
