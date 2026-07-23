@@ -4,6 +4,7 @@ import { Navbar, type Page } from "../components/layout/Navbar";
 import { Hero } from "../components/home/Hero";
 import { FeaturedDestinations } from "../components/home/FeaturedDestinations";
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
+import { WhyChooseUs } from "../components/home/WhyChooseUs";
 import {
   MapPin,
   Calendar,
@@ -338,45 +339,7 @@ export default function App() {
           />
 
           {/* Why Us */}
-          <section className="py-16 bg-muted">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="text-center mb-12">
-                <p className="text-accent text-sm font-bold uppercase tracking-widest mb-2">Why Wanderlust</p>
-                <h2 className="text-4xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-                  Travel With Confidence
-                </h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {[
-                  {
-                    icon: Shield,
-                    title: "Fully Protected",
-                    desc: "Every booking is covered by ATOL protection and comprehensive travel insurance options.",
-                  },
-                  {
-                    icon: Clock,
-                    title: "24/7 Support",
-                    desc: "Our team is available around the clock — before, during, and after your journey.",
-                  },
-                  {
-                    icon: Star,
-                    title: "Expert Curation",
-                    desc: "Every destination, hotel, and guide is personally vetted by our travel specialists.",
-                  },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="bg-card rounded-2xl p-8 text-center shadow-sm">
-                    <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Icon size={26} className="text-primary" />
-                    </div>
-                    <h3 className="text-lg font-bold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>
-                      {title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{desc}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
+          <WhyChooseUs />
 
           {/* Testimonials */}
           <section className="py-20 px-6 max-w-7xl mx-auto">
