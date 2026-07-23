@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Navbar, type Page } from "../components/layout/Navbar";
 import { Hero } from "../components/home/Hero";
+import { StatsBar } from "../components/home/StatsBar";
 import { FeaturedDestinations } from "../components/home/FeaturedDestinations";
 import { DESTINATIONS, PACKAGES, TESTIMONIALS } from "../data";
 import { WhyChooseUs } from "../components/home/WhyChooseUs";
@@ -312,23 +313,7 @@ export default function App() {
           />
 
           {/* Stats bar */}
-          <section className="bg-primary text-primary-foreground py-6">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              {[
-                { value: "60+", label: "Destinations" },
-                { value: "12,400+", label: "Happy Travelers" },
-                { value: "98%", label: "Satisfaction Rate" },
-                { value: "15 yrs", label: "of Experience" },
-              ].map((s) => (
-                <div key={s.label}>
-                  <p className="text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    {s.value}
-                  </p>
-                  <p className="text-primary-foreground/70 text-sm mt-0.5">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+          <StatsBar />
 
           {/* Featured Destinations */}
           <FeaturedDestinations
