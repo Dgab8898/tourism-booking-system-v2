@@ -1,10 +1,9 @@
 import bcrypt from "bcryptjs";
-import {
+import mongoose, {
   HydratedDocument,
   Model,
   Schema,
   model,
-  models,
 } from "mongoose";
 
 import { IUser, UserRole } from "../types/user.types.js";
@@ -111,7 +110,7 @@ userSchema.methods.comparePassword = async function comparePassword(
 };
 
 const User =
-  (models.User as UserModel | undefined) ||
+  (mongoose.models.User as UserModel | undefined) ||
   model<IUser, UserModel>("User", userSchema);
 
 export default User;

@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import type { Server } from "node:http";
 
-import { app } from "./app.js";
+import app from "./app.js";
 import {
   connectDatabase,
   disconnectDatabase,

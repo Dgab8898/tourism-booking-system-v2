@@ -12,9 +12,13 @@ const environmentSchema = z.object({
     .max(65535)
     .default(5001),
 
-  MONGODB_URI: z
+  MONGODB_URI: z.string().min(1, "MONGODB_URI is required"),
+
+  JWT_SECRET: z
     .string()
-    .min(1, "MONGODB_URI is required"),
+    .min(32, "JWT_SECRET must contain at least 32 characters"),
+
+  JWT_EXPIRES_IN: z.string().min(1).default("1d"),
 });
 
 const result = environmentSchema.safeParse(process.env);
