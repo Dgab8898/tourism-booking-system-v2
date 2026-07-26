@@ -1,3 +1,4 @@
+import tourRouter from "./routes/tour.routes.js";
 import cors from "cors";
 import express, {
   type NextFunction,
@@ -25,6 +26,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/tours", tourRouter);
 
 app.use(handleAuthError);
 
