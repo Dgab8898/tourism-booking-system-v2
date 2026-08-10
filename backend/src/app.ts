@@ -1,4 +1,4 @@
-import tourRouter from "./routes/tour.routes.js";
+import { handleBookingError } from "./controllers/booking.controller.js";
 import cors from "cors";
 import express, {
   type NextFunction,
@@ -10,6 +10,8 @@ import morgan from "morgan";
 
 import { handleAuthError } from "./controllers/auth.controller.js";
 import authRouter from "./routes/auth.routes.js";
+import bookingRouter from "./routes/booking.routes.js";
+import tourRouter from "./routes/tour.routes.js";
 
 const app = express();
 
@@ -27,8 +29,10 @@ app.get("/api/health", (_req: Request, res: Response) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/tours", tourRouter);
+app.use("/api/bookings", bookingRouter);
 
 app.use(handleAuthError);
+app.use(handleBookingError);
 
 app.use(
   (

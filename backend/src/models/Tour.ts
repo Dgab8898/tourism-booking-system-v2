@@ -1,8 +1,17 @@
-import { Schema, model } from "mongoose";
+import mongoose, {
+  type Model,
+  Schema,
+  model,
+} from "mongoose";
 
-import { TourDifficulty } from "../types/tour.types.js";
+import {
+  type ITour,
+  TourDifficulty,
+} from "../types/tour.types.js";
 
-const tourSchema = new Schema(
+type TourModel = Model<ITour>;
+
+const tourSchema = new Schema<ITour, TourModel>(
   {
     title: {
       type: String,
@@ -80,6 +89,8 @@ tourSchema.index({ destination: 1 });
 tourSchema.index({ price: 1 });
 tourSchema.index({ title: "text", description: "text" });
 
-const Tour = model("Tour", tourSchema);
+const Tour =
+  (mongoose.models.Tour as TourModel | undefined) ||
+  model<ITour, TourModel>("Tour", tourSchema);
 
 export default Tour;
