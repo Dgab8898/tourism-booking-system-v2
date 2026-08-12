@@ -1,478 +1,251 @@
-import { type FormEvent, useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  ArrowRight,
+  Calendar,
   Check,
-  ChevronRight,
+  Loader2,
+  Users,
   X,
 } from "lucide-react";
 
-import type { TravelPackage } from "../../types/travel";
+import {
+  createBooking,
+  type Booking,
+} from "../../services/booking.service";
+
+import type { Tour } from "../../services/tour.service";
 
 interface BookingModalProps {
-  pkg: TravelPackage | null;
+  tour: Tour;
   onClose: () => void;
+  onBooked: (booking: Booking) => void;
 }
-
-interface BookingFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  checkIn: string;
-  checkOut: string;
-  travelers: string;
-  requests: string;
-}
-
-const INITIAL_FORM: BookingFormData = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  checkIn: "",
-  checkOut: "",
-  travelers: "2",
-  requests: "",
-};
 
 export function BookingModal({
-  pkg,
+  tour,
   onClose,
+  onBooked,
 }: BookingModalProps) {
-  const [step, setStep] = useState<1 | 2>(1);
-  const [form, setForm] =
-    useState<BookingFormData>(INITIAL_FORM);
-  const [submitted, setSubmitted] = useState(false);
+  const [travelDate, setTravelDate] = useState(
+    tour.availableDates[0] ?? "",
+  );
 
-  if (!pkg) {
-    return null;
+  const [travellers, setTravellers] =
+    useState(1);
+
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] =
+    useState(false);
+
+  const totalPrice = useMemo(
+    () => tour.price * travellers,
+    [tour.price, travellers],
+  );
+
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+
+    setError("");
+    setSubmitting(true);
+
+    try {
+      const response = await createBooking({
+        tour: tour._id,
+        travelDate,
+        travellers,
+      });
+
+      onBooked(response.data.booking);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create booking",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitted(true);
-  };
-
-  const updateForm = (
-    field: keyof BookingFormData,
-    value: string,
-  ) => {
-    setForm((currentForm) => ({
-      ...currentForm,
-      [field]: value,
-    }));
-  };
-
-  const totalPrice =
-    pkg.price * Number.parseInt(form.travelers, 10);
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="booking-modal-title"
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
         aria-label="Close booking modal"
-        className="absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm"
         onClick={onClose}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
 
-      <div
-        className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-card shadow-2xl"
-        style={{ fontFamily: "'Nunito', sans-serif" }}
-      >
-        <header className="relative h-40 overflow-hidden bg-primary">
-          <img
-            src={pkg.image}
-            alt={pkg.title}
-            className="h-full w-full object-cover opacity-40"
-          />
+      <section className="relative z-10 w-full max-w-lg rounded-2xl bg-card p-8 shadow-2xl">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted"
+        >
+          <X size={18} />
+        </button>
 
-          <div className="absolute inset-0 flex items-end p-6">
-            <div>
-              <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-accent">
-                {pkg.category} Package
-              </p>
+        <p className="mb-2 text-sm font-bold uppercase tracking-widest text-accent">
+          Complete Booking
+        </p>
 
-              <h2
-                id="booking-modal-title"
-                className="text-2xl font-bold text-white"
+        <h2
+          className="mb-2 text-3xl font-bold"
+          style={{
+            fontFamily:
+              "'Playfair Display', serif",
+          }}
+        >
+          {tour.title}
+        </h2>
+
+        <p className="mb-6 text-muted-foreground">
+          {tour.destination}
+        </p>
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5"
+        >
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold">
+              Travel Date
+            </label>
+
+            <div className="relative">
+              <Calendar
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+
+              <select
+                required
+                value={travelDate}
+                onChange={(event) =>
+                  setTravelDate(
+                    event.target.value,
+                  )
+                }
+                className="w-full rounded-xl border border-border bg-input-background py-3 pl-10 pr-4 text-sm"
+              >
+                {tour.availableDates.map(
+                  (date) => (
+                    <option
+                      key={date}
+                      value={date}
+                    >
+                      {new Date(
+                        date,
+                      ).toLocaleDateString()}
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold">
+              Travellers
+            </label>
+
+            <div className="relative">
+              <Users
+                size={16}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+
+              <select
+                value={travellers}
+                onChange={(event) =>
+                  setTravellers(
+                    Number(event.target.value),
+                  )
+                }
+                className="w-full rounded-xl border border-border bg-input-background py-3 pl-10 pr-4 text-sm"
+              >
+                {Array.from(
+                  {
+                    length:
+                      tour.maxGroupSize,
+                  },
+                  (_, index) =>
+                    index + 1,
+                ).map((count) => (
+                  <option
+                    key={count}
+                    value={count}
+                  >
+                    {count}{" "}
+                    {count === 1
+                      ? "Traveller"
+                      : "Travellers"}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-muted p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                Total
+              </span>
+
+              <strong
+                className="text-2xl text-primary"
                 style={{
-                  fontFamily: "'Playfair Display', serif",
+                  fontFamily:
+                    "'Playfair Display', serif",
                 }}
               >
-                {pkg.title}
-              </h2>
+                $
+                {totalPrice.toLocaleString()}
+              </strong>
             </div>
+
+            <p className="mt-1 text-xs text-muted-foreground">
+              {travellers} × $
+              {tour.price.toLocaleString()}
+            </p>
           </div>
+
+          {error && (
+            <div
+              role="alert"
+              className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            >
+              {error}
+            </div>
+          )}
 
           <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close booking modal"
-            className="absolute right-4 top-4 rounded-full bg-white/20 p-1.5 text-white transition-colors hover:bg-white/30"
+            type="submit"
+            disabled={
+              submitting ||
+              !travelDate
+            }
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-bold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <X size={18} />
+            {submitting ? (
+              <>
+                <Loader2
+                  size={16}
+                  className="animate-spin"
+                />
+                Creating Booking...
+              </>
+            ) : (
+              <>
+                <Check size={16} />
+                Confirm Booking
+              </>
+            )}
           </button>
-        </header>
-
-        {!submitted ? (
-          <div className="p-6">
-            <div className="mb-6 flex items-center gap-3">
-              {[1, 2].map((stepNumber) => (
-                <div
-                  key={stepNumber}
-                  className="flex items-center gap-2"
-                >
-                  <div
-                    className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors ${
-                      step >= stepNumber
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {step > stepNumber ? (
-                      <Check size={14} />
-                    ) : (
-                      stepNumber
-                    )}
-                  </div>
-
-                  <span
-                    className={`text-sm ${
-                      step >= stepNumber
-                        ? "font-medium text-foreground"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    {stepNumber === 1
-                      ? "Travel Details"
-                      : "Your Info"}
-                  </span>
-
-                  {stepNumber < 2 && (
-                    <ChevronRight
-                      size={14}
-                      className="text-muted-foreground"
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <form onSubmit={handleSubmit}>
-              {step === 1 && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="booking-check-in"
-                        className="mb-1 block text-sm font-semibold text-foreground"
-                      >
-                        Check-in Date
-                      </label>
-
-                      <input
-                        id="booking-check-in"
-                        type="date"
-                        required
-                        value={form.checkIn}
-                        onChange={(event) =>
-                          updateForm(
-                            "checkIn",
-                            event.target.value,
-                          )
-                        }
-                        className="w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="booking-check-out"
-                        className="mb-1 block text-sm font-semibold text-foreground"
-                      >
-                        Check-out Date
-                      </label>
-
-                      <input
-                        id="booking-check-out"
-                        type="date"
-                        required
-                        value={form.checkOut}
-                        onChange={(event) =>
-                          updateForm(
-                            "checkOut",
-                            event.target.value,
-                          )
-                        }
-                        className="w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="booking-travelers"
-                      className="mb-1 block text-sm font-semibold text-foreground"
-                    >
-                      Number of Travelers
-                    </label>
-
-                    <select
-                      id="booking-travelers"
-                      value={form.travelers}
-                      onChange={(event) =>
-                        updateForm(
-                          "travelers",
-                          event.target.value,
-                        )
-                      }
-                      className="w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    >
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map(
-                        (travelerCount) => (
-                          <option
-                            key={travelerCount}
-                            value={String(travelerCount)}
-                          >
-                            {travelerCount}{" "}
-                            {travelerCount === 1
-                              ? "Traveler"
-                              : "Travelers"}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="booking-requests"
-                      className="mb-1 block text-sm font-semibold text-foreground"
-                    >
-                      Special Requests
-                    </label>
-
-                    <textarea
-                      id="booking-requests"
-                      value={form.requests}
-                      onChange={(event) =>
-                        updateForm(
-                          "requests",
-                          event.target.value,
-                        )
-                      }
-                      placeholder="Dietary requirements, accessibility needs, anniversaries..."
-                      rows={3}
-                      className="w-full resize-none rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between rounded-xl bg-muted p-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Total (est.)
-                      </p>
-
-                      <p
-                        className="text-2xl font-bold text-primary"
-                        style={{
-                          fontFamily:
-                            "'Playfair Display', serif",
-                        }}
-                      >
-                        ${totalPrice.toLocaleString()}
-                      </p>
-                    </div>
-
-                    <div className="text-right text-sm text-muted-foreground">
-                      <p>
-                        {form.travelers} × $
-                        {pkg.price.toLocaleString()}
-                      </p>
-
-                      <p className="line-through">
-                        $
-                        {pkg.originalPrice.toLocaleString()}{" "}
-                        per person
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-                  >
-                    Continue
-                    <ArrowRight size={16} />
-                  </button>
-                </div>
-              )}
-
-              {step === 2 && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label
-                        htmlFor="booking-first-name"
-                        className="mb-1 block text-sm font-semibold text-foreground"
-                      >
-                        First Name
-                      </label>
-
-                      <input
-                        id="booking-first-name"
-                        type="text"
-                        required
-                        value={form.firstName}
-                        onChange={(event) =>
-                          updateForm(
-                            "firstName",
-                            event.target.value,
-                          )
-                        }
-                        placeholder="Elena"
-                        className="w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="booking-last-name"
-                        className="mb-1 block text-sm font-semibold text-foreground"
-                      >
-                        Last Name
-                      </label>
-
-                      <input
-                        id="booking-last-name"
-                        type="text"
-                        required
-                        value={form.lastName}
-                        onChange={(event) =>
-                          updateForm(
-                            "lastName",
-                            event.target.value,
-                          )
-                        }
-                        placeholder="Rossi"
-                        className="w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="booking-email"
-                      className="mb-1 block text-sm font-semibold text-foreground"
-                    >
-                      Email Address
-                    </label>
-
-                    <input
-                      id="booking-email"
-                      type="email"
-                      required
-                      value={form.email}
-                      onChange={(event) =>
-                        updateForm(
-                          "email",
-                          event.target.value,
-                        )
-                      }
-                      placeholder="elena@example.com"
-                      className="w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="booking-phone"
-                      className="mb-1 block text-sm font-semibold text-foreground"
-                    >
-                      Phone Number
-                    </label>
-
-                    <input
-                      id="booking-phone"
-                      type="tel"
-                      value={form.phone}
-                      onChange={(event) =>
-                        updateForm(
-                          "phone",
-                          event.target.value,
-                        )
-                      }
-                      placeholder="+1 555 000 0000"
-                      className="w-full rounded-lg border border-border bg-input-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    />
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="flex-1 rounded-xl border border-border py-3 font-semibold text-foreground transition-colors hover:bg-muted"
-                    >
-                      Back
-                    </button>
-
-                    <button
-                      type="submit"
-                      className="flex-1 rounded-xl bg-accent py-3 font-semibold text-white transition-opacity hover:opacity-90"
-                    >
-                      Confirm Booking
-                    </button>
-                  </div>
-                </div>
-              )}
-            </form>
-          </div>
-        ) : (
-          <div className="p-10 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <Check
-                size={32}
-                className="text-primary"
-              />
-            </div>
-
-            <h3
-              className="mb-2 text-2xl font-bold text-foreground"
-              style={{
-                fontFamily: "'Playfair Display', serif",
-              }}
-            >
-              Booking Confirmed!
-            </h3>
-
-            <p className="mb-1 text-muted-foreground">
-              Thank you, {form.firstName}. Your inquiry
-              for <strong>{pkg.title}</strong> has been
-              received.
-            </p>
-
-            <p className="mb-6 text-sm text-muted-foreground">
-              A confirmation has been sent to{" "}
-              <strong>{form.email}</strong>. Our team will
-              reach out within 24 hours.
-            </p>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl bg-primary px-8 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Close
-            </button>
-          </div>
-        )}
-      </div>
+        </form>
+      </section>
     </div>
   );
 }
