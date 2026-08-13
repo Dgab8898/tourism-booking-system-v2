@@ -1,3 +1,4 @@
+import { AdminToursPage } from "../components/admin/AdminToursPage";
 import { AdminBookingsPage } from "../components/admin/AdminBookingsPage";
 import { MyBookingsPage } from "../components/bookings/MyBookingsPage";
 
@@ -396,6 +397,11 @@ function closeBookingSuccess(): void {
 {page === "admin-bookings" &&
   currentUser?.role === "admin" && (
     <AdminBookingsPage />
+  )}
+
+  {page === "admin-tours" &&
+  currentUser?.role === "admin" && (
+    <AdminToursPage />
   )}
 
       {/* ABOUT */}

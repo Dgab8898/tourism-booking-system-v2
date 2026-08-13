@@ -12,6 +12,7 @@ export type Page =
   | "packages"
   | "bookings"
   | "admin-bookings"
+  "admin-tours"
   | "about"
   | "login";
 
@@ -140,6 +141,50 @@ export function Navbar({
               Admin Bookings
             </button>
           )}
+
+          {user?.role === "admin" && (
+  <>
+    <button
+      type="button"
+      onClick={() =>
+        onNavigate("admin-bookings")
+      }
+      aria-current={
+        currentPage === "admin-bookings"
+          ? "page"
+          : undefined
+      }
+      className={`flex items-center gap-1.5 text-sm font-semibold transition-colors ${
+        currentPage === "admin-bookings"
+          ? "text-primary"
+          : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      <ShieldCheck size={15} />
+      Admin Bookings
+    </button>
+
+    <button
+      type="button"
+      onClick={() =>
+        onNavigate("admin-tours")
+      }
+      aria-current={
+        currentPage === "admin-tours"
+          ? "page"
+          : undefined
+      }
+      className={`flex items-center gap-1.5 text-sm font-semibold transition-colors ${
+        currentPage === "admin-tours"
+          ? "text-primary"
+          : "text-muted-foreground hover:text-foreground"
+      }`}
+    >
+      <Plane size={15} />
+      Admin Tours
+    </button>
+  </>
+)}
         </nav>
 
         <div className="flex items-center gap-3">
