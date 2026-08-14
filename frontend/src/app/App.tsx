@@ -1,13 +1,8 @@
-import { AdminToursPage } from "../components/admin/AdminToursPage";
-import { AdminBookingsPage } from "../components/admin/AdminBookingsPage";
-import { MyBookingsPage } from "../components/bookings/MyBookingsPage";
+import {
+  useEffect,
+  useState,
+} from "react";
 
-import { BookingModal } from "../components/booking/BookingModal";
-
-import type { Booking } from "../services/booking.service";
-
-
-import { useState } from "react";
 import {
   Facebook,
   Heart,
@@ -21,7 +16,11 @@ import {
   Twitter,
 } from "lucide-react";
 
+import { AdminBookingsPage } from "../components/admin/AdminBookingsPage";
+import { AdminToursPage } from "../components/admin/AdminToursPage";
 import { Login } from "../components/auth/Login";
+import { BookingModal } from "../components/booking/BookingModal";
+import { MyBookingsPage } from "../components/bookings/MyBookingsPage";
 import { CallToAction } from "../components/home/CallToAction";
 import { FeaturedDestinations } from "../components/home/FeaturedDestinations";
 import { Hero } from "../components/home/Hero";
@@ -42,6 +41,7 @@ import {
   TESTIMONIALS,
 } from "../data";
 
+import type { Booking } from "../services/booking.service";
 import type { LoginResponse } from "../services/auth.service";
 import type { Tour } from "../services/tour.service";
 
@@ -83,17 +83,44 @@ export default function App() {
     setSearchTravelers,
   ] = useState("2");
 
-  const [wishlist, setWishlist] = useState<
-    number[]
-  >([]);
+  const [wishlist, setWishlist] =
+    useState<number[]>([]);
 
   const [selectedTour, setSelectedTour] =
     useState<Tour | null>(null);
 
-  const [completedBooking, setCompletedBooking] =
-  useState<Booking | null>(null);
+  const [
+    completedBooking,
+    setCompletedBooking,
+  ] = useState<Booking | null>(null);
 
-  function toggleWishlist(id: number): void {
+  useEffect(() => {
+    function handleUnauthorized(): void {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      setCurrentUser(null);
+      setSelectedTour(null);
+      setCompletedBooking(null);
+      setPage("login");
+    }
+
+    window.addEventListener(
+      "auth:unauthorized",
+      handleUnauthorized,
+    );
+
+    return () => {
+      window.removeEventListener(
+        "auth:unauthorized",
+        handleUnauthorized,
+      );
+    };
+  }, []);
+
+  function toggleWishlist(
+    id: number,
+  ): void {
     setWishlist((previous) =>
       previous.includes(id)
         ? previous.filter(
@@ -109,17 +136,20 @@ export default function App() {
     setCurrentUser(response.data.user);
     setPage("home");
   }
-function handleLogout(): void {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
 
-  setCurrentUser(null);
-  setSelectedTour(null);
-  setCompletedBooking(null);
-  setPage("home");
-}
+  function handleLogout(): void {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-  function handleBookTour(tour: Tour): void {
+    setCurrentUser(null);
+    setSelectedTour(null);
+    setCompletedBooking(null);
+    setPage("home");
+  }
+
+  function handleBookTour(
+    tour: Tour,
+  ): void {
     if (!currentUser) {
       setPage("login");
       return;
@@ -128,20 +158,16 @@ function handleLogout(): void {
     setSelectedTour(tour);
   }
 
-  function closeSelectedTour(): void {
+  function handleBookingCreated(
+    booking: Booking,
+  ): void {
+    setCompletedBooking(booking);
     setSelectedTour(null);
   }
 
-  function handleBookingCreated(
-  booking: Booking,
-): void {
-  setCompletedBooking(booking);
-  setSelectedTour(null);
-}
-
-function closeBookingSuccess(): void {
-  setCompletedBooking(null);
-}
+  function closeBookingSuccess(): void {
+    setCompletedBooking(null);
+  }
 
   return (
     <div
@@ -348,7 +374,11 @@ function closeBookingSuccess(): void {
                       </span>
 
                       <span className="text-xs text-muted-foreground">
-                        ({destination.reviews})
+                        (
+                        {
+                          destination.reviews
+                        }
+                        )
                       </span>
                     </div>
                   </div>
@@ -390,19 +420,24 @@ function closeBookingSuccess(): void {
       )}
 
       {/* MY BOOKINGS */}
-{page === "bookings" && currentUser && (
-  <MyBookingsPage />
-)}
+      {page === "bookings" &&
+        currentUser && (
+          <MyBookingsPage />
+        )}
 
-{page === "admin-bookings" &&
-  currentUser?.role === "admin" && (
-    <AdminBookingsPage />
-  )}
+      {/* ADMIN BOOKINGS */}
+      {page === "admin-bookings" &&
+        currentUser?.role ===
+          "admin" && (
+          <AdminBookingsPage />
+        )}
 
-  {page === "admin-tours" &&
-  currentUser?.role === "admin" && (
-    <AdminToursPage />
-  )}
+      {/* ADMIN TOURS */}
+      {page === "admin-tours" &&
+        currentUser?.role ===
+          "admin" && (
+          <AdminToursPage />
+        )}
 
       {/* ABOUT */}
       {page === "about" && (
@@ -442,7 +477,8 @@ function closeBookingSuccess(): void {
                     "'Playfair Display', serif",
                 }}
               >
-                We Believe Travel Changes People
+                We Believe Travel Changes
+                People
               </h2>
 
               <p className="mb-4 leading-relaxed text-muted-foreground">
@@ -455,9 +491,9 @@ function closeBookingSuccess(): void {
               <p className="leading-relaxed text-muted-foreground">
                 We believe in authentic local
                 connections, responsible
-                tourism, and journeys that stay
-                with travellers long after they
-                return home.
+                tourism, and journeys that
+                stay with travellers long
+                after they return home.
               </p>
             </div>
 
@@ -529,106 +565,119 @@ function closeBookingSuccess(): void {
         </main>
       )}
 
-     {/* BOOKING */}
-{selectedTour && (
-  <BookingModal
-    tour={selectedTour}
-    onClose={() => setSelectedTour(null)}
-    onBooked={handleBookingCreated}
-  />
-)}
+      {/* BOOKING */}
+      {selectedTour && (
+        <BookingModal
+          tour={selectedTour}
+          onClose={() =>
+            setSelectedTour(null)
+          }
+          onBooked={
+            handleBookingCreated
+          }
+        />
+      )}
 
-{/* BOOKING SUCCESS */}
-{completedBooking && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-    <button
-      type="button"
-      aria-label="Close booking confirmation"
-      onClick={closeBookingSuccess}
-      className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-    />
+      {/* BOOKING SUCCESS */}
+      {completedBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Close booking confirmation"
+            onClick={
+              closeBookingSuccess
+            }
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
 
-    <section className="relative z-10 w-full max-w-md rounded-2xl bg-card p-8 text-center shadow-2xl">
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-        <span className="text-3xl text-primary">
-          ✓
-        </span>
-      </div>
+          <section className="relative z-10 w-full max-w-md rounded-2xl bg-card p-8 text-center shadow-2xl">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <span className="text-3xl text-primary">
+                ✓
+              </span>
+            </div>
 
-      <p className="mb-2 text-sm font-bold uppercase tracking-widest text-accent">
-        Booking Received
-      </p>
+            <p className="mb-2 text-sm font-bold uppercase tracking-widest text-accent">
+              Booking Received
+            </p>
 
-      <h2
-        className="mb-3 text-3xl font-bold text-foreground"
-        style={{
-          fontFamily:
-            "'Playfair Display', serif",
-        }}
-      >
-        Your Journey Is Reserved
-      </h2>
+            <h2
+              className="mb-3 text-3xl font-bold text-foreground"
+              style={{
+                fontFamily:
+                  "'Playfair Display', serif",
+              }}
+            >
+              Your Journey Is Reserved
+            </h2>
 
-      <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
-        Your booking has been created successfully
-        and is currently awaiting confirmation.
-      </p>
+            <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
+              Your booking has been created
+              successfully and is currently
+              awaiting confirmation.
+            </p>
 
-      <div className="mb-6 space-y-3 rounded-xl bg-muted p-5 text-left">
-        <div className="flex justify-between gap-4">
-          <span className="text-sm text-muted-foreground">
-            Travellers
-          </span>
+            <div className="mb-6 space-y-3 rounded-xl bg-muted p-5 text-left">
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-muted-foreground">
+                  Travellers
+                </span>
 
-          <strong>
-            {completedBooking.travellers}
-          </strong>
+                <strong>
+                  {
+                    completedBooking.travellers
+                  }
+                </strong>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-muted-foreground">
+                  Travel date
+                </span>
+
+                <strong>
+                  {new Date(
+                    completedBooking.travelDate,
+                  ).toLocaleDateString()}
+                </strong>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-muted-foreground">
+                  Total
+                </span>
+
+                <strong className="text-primary">
+                  $
+                  {completedBooking.totalPrice.toLocaleString()}
+                </strong>
+              </div>
+
+              <div className="flex justify-between gap-4">
+                <span className="text-sm text-muted-foreground">
+                  Status
+                </span>
+
+                <strong className="capitalize">
+                  {
+                    completedBooking.status
+                  }
+                </strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={
+                closeBookingSuccess
+              }
+              className="w-full rounded-xl bg-primary py-3 font-bold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              Continue Exploring
+            </button>
+          </section>
         </div>
-
-        <div className="flex justify-between gap-4">
-          <span className="text-sm text-muted-foreground">
-            Travel date
-          </span>
-
-          <strong>
-            {new Date(
-              completedBooking.travelDate,
-            ).toLocaleDateString()}
-          </strong>
-        </div>
-
-        <div className="flex justify-between gap-4">
-          <span className="text-sm text-muted-foreground">
-            Total
-          </span>
-
-          <strong className="text-primary">
-            $
-            {completedBooking.totalPrice.toLocaleString()}
-          </strong>
-        </div>
-
-        <div className="flex justify-between gap-4">
-          <span className="text-sm text-muted-foreground">
-            Status
-          </span>
-
-          <strong className="capitalize">
-            {completedBooking.status}
-          </strong>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={closeBookingSuccess}
-        className="w-full rounded-xl bg-primary py-3 font-bold text-primary-foreground transition-opacity hover:opacity-90"
-      >
-        Continue Exploring
-      </button>
-    </section>
-  </div>
-)}
+      )}
 
       {/* FOOTER */}
       <footer className="mt-auto bg-foreground text-background/80">
@@ -664,18 +713,20 @@ function closeBookingSuccess(): void {
                   Instagram,
                   Facebook,
                   Twitter,
-                ].map((Icon, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-background/10 transition-colors hover:bg-background/20"
-                  >
-                    <Icon
-                      size={15}
-                      className="text-background"
-                    />
-                  </button>
-                ))}
+                ].map(
+                  (Icon, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-background/10 transition-colors hover:bg-background/20"
+                    >
+                      <Icon
+                        size={15}
+                        className="text-background"
+                      />
+                    </button>
+                  ),
+                )}
               </div>
             </div>
 
@@ -717,16 +768,18 @@ function closeBookingSuccess(): void {
                 </h4>
 
                 <ul className="space-y-2">
-                  {column.links.map((link) => (
-                    <li key={link}>
-                      <button
-                        type="button"
-                        className="text-sm transition-colors hover:text-background"
-                      >
-                        {link}
-                      </button>
-                    </li>
-                  ))}
+                  {column.links.map(
+                    (link) => (
+                      <li key={link}>
+                        <button
+                          type="button"
+                          className="text-sm transition-colors hover:text-background"
+                        >
+                          {link}
+                        </button>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             ))}
